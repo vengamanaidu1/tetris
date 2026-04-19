@@ -1,0 +1,32 @@
+name: tetris cicd pipeline 
+
+on: 
+  push: 
+    branches: ["main"]
+
+  jobs:
+    build-test-push:
+      runs-on: ubuntu-latest
+
+      steps: 
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build image 
+        run: docker build -t tetris .
+
+      - name: Test container 
+        run: |
+          docker run -d -p 8080:80 --name test-container tetris
+          sleep 5
+          curl -f http://localhost:8080 || exit 1
+
+      - name: Login Docker hub 
+        run: echo "${{ secrets.dckr_pat_dUibVQqzZzR2fXz0nEMMPiFbPqQ }}" | docker login -u ${{ secrets.vengamanaidu12 }} --password-stdin
+    
+      - name: Tag image 
+        run: docker tag tetris ${{ secrets.vengamanaidu12 }}/tetris:${{ github.sha }}
+
+      - name: push 
+        run: docker push ${{ secrets.vengamanaidu12 }}/tetris:${{ github.sha }}
