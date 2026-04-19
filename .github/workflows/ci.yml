@@ -16,12 +16,12 @@ jobs:
 
     # 2. Build Docker image
     - name: Build image
-      run: docker build -t tetris .
+      run: docker build -t tetris-app .
 
     # 3. Test container
     - name: Test container
       run: |
-        docker run -d -p 8080:80 --name test-container tetris
+        docker run -d -p 8080:80 --name test-container tetris-app
         sleep 5
         curl -f http://localhost:8080
         docker stop test-container
@@ -34,11 +34,11 @@ jobs:
     # 5. Tag image (commit + latest)
     - name: Tag image
       run: |
-        docker tag tetris ${{ secrets.DOCKER_USERNAME }}/tetris:${{ github.sha }}
-        docker tag tetris ${{ secrets.DOCKER_USERNAME }}/tetris:latest
+        docker tag tetris-app ${{ secrets.DOCKER_USERNAME }}/tetris-app:${{ github.sha }}
+        docker tag tetris-app ${{ secrets.DOCKER_USERNAME }}/tetris-app:latest
 
     # 6. Push image
     - name: Push image
       run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/tetris:${{ github.sha }}
-        docker push ${{ secrets.DOCKER_USERNAME }}/tetris:latest
+        docker push ${{ secrets.DOCKER_USERNAME }}/tetris-app:${{ github.sha }}
+        docker push ${{ secrets.DOCKER_USERNAME }}/tetris-app:latest
