@@ -1,0 +1,38 @@
+name: Tetris CI/CD Pipeline
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build-test-push:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # 1. Checkout code
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # 2. Build image
+    - name: Build image 
+      run: docker build -t tetris .
+
+    # 3. Test container
+    - name: Test container 
+      run: |
+        docker run -d -p 8080:80 --name test-container tetris
+        sleep 5
+        curl -f http://localhost:8080 || exit 1
+
+    # 4. Login to Docker Hub
+    - name: Login Docker Hub 
+      run: echo "${{ secrets.DOCKER_PASS }}" | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
+
+    # 5. Tag image
+    - name: Tag image 
+      run: docker tag tetris ${{ secrets.DOCKER_USER }}/tetris:${{ github.sha }}
+
+    # 6. Push image
+    - name: Push image 
+      run: docker push ${{ secrets.DOCKER_USER }}/tetris:${{ github.sha }}
