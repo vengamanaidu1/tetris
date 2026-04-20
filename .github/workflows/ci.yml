@@ -17,7 +17,10 @@ jobs:
     # 2. Build Docker image
     - name: Build image
       run: docker build -t tetris-app .
-
+      
+    - name: Scan image with Trivy
+      run: docker run --rm aquasec/trivy image tetris
+      
     # 3. Test container
     - name: Test container
       run: |
