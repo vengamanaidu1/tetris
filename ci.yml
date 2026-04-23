@@ -14,31 +14,49 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # 2. Build Docker image
-    - name: Build image
-      run: docker build -t tetris .
+    # 2. Scan filesystem (early security check)
+    - name: Trivy FS Scan
+      run: |
+        docker run --rm \
+          -v ${{ github.workspace }}:/app \
+          aquasec/trivy fs /app \
+          --severity HIGH,CRITICAL \
+          --exit-code 1
 
-    # 3. Test container
+    # 3. Build Docker image
+    - name: Build image
+      run: docker build -t tetris-app .
+
+    # 4. Scan image (THIS is the real gate)
+    - name: Trivy Image Scan
+      run: |
+        docker run --rm \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          aquasec/trivy image tetris-app \
+          --severity HIGH,CRITICAL \
+          --exit-code 1
+
+    # 5. Test container
     - name: Test container
       run: |
-        docker run -d -p 8080:80 --name test-container tetris
+        docker run -d -p 8080:80 --name test-container tetris-app
         sleep 5
         curl -f http://localhost:8080
         docker stop test-container
         docker rm test-container
 
-    # 4. Login to Docker Hub
+    # 6. Login to Docker Hub
     - name: Login to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    # 5. Tag image (commit + latest)
+    # 7. Tag image
     - name: Tag image
       run: |
-        docker tag tetris ${{ secrets.DOCKER_USERNAME }}/tetris:${{ github.sha }}
-        docker tag tetris ${{ secrets.DOCKER_USERNAME }}/tetris:latest
+        docker tag tetris-app ${{ secrets.DOCKER_USERNAME }}/tetris-app:${{ github.sha }}
+        docker tag tetris-app ${{ secrets.DOCKER_USERNAME }}/tetris-app:latest
 
-    # 6. Push image
+    # 8. Push image (ONLY if everything passed)
     - name: Push image
       run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/tetris:${{ github.sha }}
-        docker push ${{ secrets.DOCKER_USERNAME }}/tetris:latest
+        docker push ${{ secrets.DOCKER_USERNAME }}/tetris-app:${{ github.sha }}
+        docker push ${{ secrets.DOCKER_USERNAME }}/tetris-app:latest
