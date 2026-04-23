@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: tetris-app-container
-        image: vegamanaidu12/tetris-app:latest
+        image: vengamanaidu12/tetris-app:latest
 
         ports:
         - containerPort: 80
