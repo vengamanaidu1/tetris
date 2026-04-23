@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tetris-deployment
+  name: tetris-app-deployment
 spec:
   replicas: 2
 
   selector:
     matchLabels:
-      app: tetris
+      app: tetris-app
 
   template:
     metadata:
       labels:
-        app: tetris
+        app: tetris-app
 
     spec:
       containers:
-      - name: tetris-container
-        image: your-dockerhub/tetris:latest
+      - name: tetris-app-container
+        image: vegamanaidu12/tetris-app:latest
 
         ports:
         - containerPort: 80
@@ -28,4 +28,4 @@ spec:
             memory: "256Mi"
           limits:
             cpu: "500m"
-            memory: "512Mi"
+            memory: "512Mi
