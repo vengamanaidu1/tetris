@@ -1,4 +1,4 @@
-apiVersion: app/V1
+apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: tetris-app
@@ -10,7 +10,7 @@ spec:
 
   source:
      repoURL: https://github.com/vengamanaidu1/tetris
-     targetRevesion: HEAD
+     targetRevision: HEAD
      path: dev 
   destination:
      server: https://kubernetes.default.svc
