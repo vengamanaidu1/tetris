@@ -11,7 +11,7 @@ spec:
   source:
      repoURL: https://github.com/vengamanaidu1/tetris
      targetRevision: HEAD
-     path: tetris
+     path: k8s
   destination:
      server: https://kubernetes.default.svc
      namespace: myapp
